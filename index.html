@@ -133,81 +133,9 @@
             box-shadow: 0 6px 12px rgba(1, 87, 155, 0.3);
         }
 
-        /* --- BMKG CUACA SECTION --- */
-        .bmkg-container {
-            padding: 40px 10% 0 10%;
-            text-align: center;
-            margin-top: 80px;
-        }
-
-        .bmkg-box {
-            background: #ffffff;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            max-width: 600px;
-            margin: 0 auto;
-            border-left: 5px solid #0288d1;
-            transition: transform 0.3s ease;
-        }
-        .bmkg-box:hover {
-            transform: scale(1.02);
-        }
-
-        .bmkg-header {
-            font-size: 14px;
-            color: #7f8c8d;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .bmkg-main {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            margin: 15px 0;
-        }
-
-        .bmkg-temp {
-            font-size: 36px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
-
-        .bmkg-desc {
-            font-size: 18px;
-            color: #34495e;
-            font-weight: 600;
-        }
-
-        .bmkg-details {
-            display: flex;
-            justify-content: space-around;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-            margin-top: 10px;
-            font-size: 13px;
-            color: #555;
-        }
-
-        .bmkg-icon {
-            width: 60px;
-            height: 60px;
-        }
-
-        .weather-update-time {
-            font-size: 11px;
-            color: #95a5a6;
-            margin-top: 8px;
-            display: block;
-        }
-
         /* --- DESTINASI SECTION --- */
         .destinasi {
-            padding: 60px 10% 40px 10%;
+            padding: 100px 10% 40px 10%; /* Padding top disesuaikan karena widget cuaca dihapus */
             text-align: center;
         }
 
@@ -525,28 +453,6 @@
         <a href="#destinasi" class="btn">Jelajahi Lapeo</a>
     </section>
 
-    <div class="bmkg-container reveal">
-        <div class="bmkg-box" id="weather-box">
-            <div class="bmkg-header">📍 Cuaca Real-Time BMKG (Campalagian)</div>
-            <div id="loading-weather">Memuat data cuaca langsung dari BMKG...</div>
-            
-            <div id="weather-content" style="display: none;">
-                <div class="bmkg-main">
-                    <img id="weather-img" class="bmkg-icon" src="" alt="Icon Cuaca">
-                    <div>
-                        <div id="weather-temp" class="bmkg-temp">--°C</div>
-                        <div id="weather-desc" class="bmkg-desc">--</div>
-                    </div>
-                </div>
-                <div class="bmkg-details">
-                    <div>💧 Kelembapan: <span id="weather-humidity">--</span>%</div>
-                    <div>💨 Kecepatan Angin: <span id="weather-wind">--</span> km/jam</div>
-                </div>
-                <small id="weather-time" class="weather-update-time">Diperbarui: --:-- WITA</small>
-            </div>
-        </div>
-    </div>
-
     <section class="destinasi reveal" id="destinasi">
         <h2>Destinasi & Potensi Wisata</h2>
         <p class="sub-title">Destinasi menarik yang wajib Anda kunjungi saat berada di Desa Lapeo</p>
@@ -650,85 +556,6 @@
     </footer>
 
     <script>
-        /* --- INTEGRASI BMKG REAL-TIME VIA CORS PROXY --- */
-        async function ambilDataCuacaBMKG() {
-            // Menggunakan proxy AllOrigins untuk menembus blokir CORS browser secara real-time
-            const urlAsli = "https://api.bmkg.go.id/publik/prakiraan-cuaca?adm2=76.04";
-            const urlAPI = `https://api.allorigins.win/raw?url=${encodeURIComponent(urlAsli)}`;
-
-            try {
-                const respon = await fetch(urlAPI);
-                if (!respon.ok) throw new Error("Respon jaringan bermasalah");
-                
-                const data = await respon.json();
-                
-                // Memastikan data wilayah Kecamatan Campalagian ditemukan
-                const dataCampalagian = data.data.find(item => item.lokasi.kecamatan === "Campalagian");
-                
-                if (dataCampalagian && dataCampalagian.prakiraan && dataCampalagian.prakiraan.cuaca) {
-                    // Menyusun array multi-dimensi prakiraan jam BMKG agar flat
-                    const listCuaca = dataCampalagian.prakiraan.cuaca.flat();
-                    
-                    // Mengambil jam sistem saat ini
-                    const jamSekarang = new Date().getHours();
-                    let cuacaTerpilih = listCuaca[0];
-                    let selisihTerkecil = 24;
-
-                    // Mencari indeks prakiraan jam BMKG yang paling dekat dengan jam pengguna saat ini
-                    listCuaca.forEach(item => {
-                        if (item.local_datetime) {
-                            // Ekstrak jam dari string datetime (format: "YYYY-MM-DD HH:mm:ss")
-                            const stringJam = item.local_datetime.split(" ")[1]; // Ambil bagian "HH:mm:ss"
-                            const jamPrakiraan = parseInt(stringJam.split(":")[0]); // Ambil "HH" angka
-                            
-                            const selisih = Math.abs(jamSekarang - jamPrakiraan);
-                            if (selisih < selisihTerkecil) {
-                                selisihTerkecil = selisih;
-                                cuacaTerpilih = item;
-                            }
-                        }
-                    });
-
-                    // Penanganan fallback ikon cuaca jika server aset gambar BMKG down/berubah link
-                    let iconSrc = cuacaTerpilih.image;
-                    if (!iconSrc || iconSrc.includes("example.com")) {
-                        iconSrc = `https://v5.weatherapi.com/weather/64x64/day/116.png`; 
-                    }
-
-                    // Perbarui Elemen Interface secara Live
-                    document.getElementById('weather-temp').innerText = cuacaTerpilih.t + "°C";
-                    document.getElementById('weather-desc').innerText = cuacaTerpilih.weather_desc;
-                    document.getElementById('weather-humidity').innerText = cuacaTerpilih.hu;
-                    document.getElementById('weather-wind').innerText = cuacaTerpilih.ws;
-                    document.getElementById('weather-img').src = iconSrc;
-
-                    // Cetak penanda waktu pembaruan
-                    const waktuSekarang = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-                    document.getElementById('weather-time').innerText = `Diperbarui langsung dari BMKG: Jam ${waktuSekarang} WITA`;
-
-                    // Ganti status loading ke blok konten utama
-                    document.getElementById('loading-weather').style.display = 'none';
-                    document.getElementById('weather-content').style.display = 'block';
-                } else {
-                    gunakanDataCadangan();
-                }
-            } catch (error) {
-                console.error("Gagal menembus API BMKG via Proxy:", error);
-                gunakanDataCadangan();
-            }
-        }
-
-        function gunakanDataCadangan() {
-            document.getElementById('weather-temp').innerText = "29°C";
-            document.getElementById('weather-desc').innerText = "Cerah Berawan (Pratinjau)";
-            document.getElementById('weather-humidity').innerText = "78";
-            document.getElementById('weather-wind').innerText = "14";
-            document.getElementById('weather-img').src = "https://cdn-icons-png.flaticon.com/512/4814/4814268.png";
-            document.getElementById('weather-time').innerText = "Mode Cadangan Aktif";
-            document.getElementById('loading-weather').style.display = 'none';
-            document.getElementById('weather-content').style.display = 'block';
-        }
-
         /* --- FITUR INTERAKTIF TAMBAHAN --- */
 
         // 1. Fungsi Klik Rute Perjalanan (Itinerary Tracker)
@@ -791,19 +618,4 @@
                 if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
                     document.querySelector("nav ul li a[href*=" + sectionId + "]").classList.add("active");
                 } else {
-                    document.querySelector("nav ul li a[href*=" + sectionId + "]").classList.remove("active");
-                }
-            });
-        }
-
-        // Jalankan fungsi awal saat halaman selesai dimuat
-        window.onload = function() {
-            ambilDataCuacaBMKG();
-            revealElements();
-            
-            // Mengulang pembaruan data cuaca otomatis di latar belakang tanpa refresh halaman setiap 10 Menit
-            setInterval(ambilDataCuacaBMKG, 600000); 
-        };
-    </script>
-</body>
-</html>
+                    document.querySelector("nav ul li a[href*=" + sectionId + "]").classList.remove
