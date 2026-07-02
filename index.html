@@ -509,7 +509,7 @@
                 <div class="card-content">
                     <h3>Masjid Nuruttaubah KH. Muhammad Thahir Imam Lapeo</h3>
                     <p>Pusat ziarah dan wisata religi Sulawesi Barat yang ikonik, didirikan oleh ulama besar penyebar Islam di tanah Mandar, KH. Muhammad Thahir.</p>
-                    <a href="javascript:void(0);" onclick="fokusPeta(-3.43573, 119.28893, 'Masjid Lapeo')" class="btn">Lihat di Peta Interaktif</a>
+                    <a href="javascript:void(0);" onclick="fokusPeta(-3.4901, 119.1322, 'Masjid Lapeo')" class="btn">Lihat di Peta Interaktif</a>
                 </div>
             </div>
 
@@ -518,9 +518,9 @@
                     <img src="images/pantai-baqbatoa.jpg" alt="Pantai Baqbatoa" class="card-img">
                 </div>
                 <div class="card-content">
-                    <h3>Pantai Baqbatoa</h3>
+                    <h3>Pantai Babatoa</h3>
                     <p>Nikmati pesona keindahan pesisir pantai dengan hamparan pasir, deburan ombak Selat Makassar yang syahdu, serta pemandangan matahari terbenam.</p>
-                    <a href="javascript:void(0);" onclick="fokusPeta(-3.45039, 119.28352, 'Pantai Baqbatoa')" class="btn">Lihat di Peta Interaktif</a>
+                    <a href="javascript:void(0);" onclick="fokusPeta(-3.4975, 119.1305, 'Pantai Baqbatoa')" class="btn">Lihat di Peta Interaktif</a>
                 </div>
             </div>
 
@@ -592,7 +592,7 @@
                         <p>Menunaikan ibadah shalat Dzuhur berjamaah di masjid, dilanjutkan makan siang mencicipi berbagai hidangan kuliner laut khas Mandar yang segar di sekitar Campalagian.</p>
                     </div>
                     <div class="rute-step" onclick="toggleRoute(this)">
-                        <h4>15.30 WITA — Refreshing di Pantai Baqbatoa</h4>
+                        <h4>15.30 WITA — Refreshing di Pantai Babatoa</h4>
                         <p>Bertolak menuju Pantai Baqbatoa untuk bersantai menikmati hembusan angin laut Selat Makassar, menyusuri pesisir pantai, dan menunggu keindahan panorama sunset.</p>
                     </div>
                 </div>
@@ -610,28 +610,28 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
-        /* --- INISIALISASI PETA LEAFLET --- */
+        /* --- INISIALISASI PETA LEAFLET (KOREKSI VISUAL) --- */
         let map;
         let markerMasjid;
         let markerPantai;
 
         function initMap() {
             try {
-                // Koordinat tengah ideal berbasis Plus Codes alamat asli Lapeo
-                map = L.map('map').setView([-3.4410, 119.2865], 14);
+                // Kamera peta di-set fokus langsung ke area Lapeo (Sisi kiri bawah frame gambar)
+                map = L.map('map').setView([-3.4925, 119.1330], 14);
 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     maxZoom: 19,
                     attribution: '© OpenStreetMap contributors'
                 }).addTo(map);
 
-                // Marker Masjid Imam Lapeo (G46J+WV2)
-                markerMasjid = L.marker([-3.43573, 119.28893]).addTo(map);
-                markerMasjid.bindPopup("<h4>Masjid Nuruttaubah Lapeo</h4><p>Pusat ziarah religi KH. Muhammad Thahir (Imam Lapeo).<br><b>Alamat:</b> Lapeo, Kec. Campalagian, Polewali Mandar</p>");
+                // Marker Masjid Imam Lapeo (Sisi kiri dekat jalan Lemo/Panyampa)
+                markerMasjid = L.marker([-3.4901, 119.1322]).addTo(map);
+                markerMasjid.bindPopup("<h4>Masjid Nuruttaubah Lapeo</h4><p>Pusat ziarah religi KH. Muhammad Thahir (Imam Lapeo).<br><b>Lokasi:</b> Lapeo, Kec. Campalagian.</p>");
 
-                // Marker Pantai Babatoa / Baqbatoa (G44M+5J9)
-                markerPantai = L.marker([-3.45039, 119.28352]).addTo(map);
-                markerPantai.bindPopup("<h4>Pantai Babatoa</h4><p>Destinasi pesisir Selat Makassar tempat berburu matahari terbenam.<br><b>Alamat:</b> Kec. Campalagian, Polewali Mandar</p>");
+                // Marker Pantai Babatoa (Pesisir lengkungan bawah Lapeo)
+                markerPantai = L.marker([-3.4975, 119.1305]).addTo(map);
+                markerPantai.bindPopup("<h4>Pantai Babatoa</h4><p>Destinasi pesisir pantai eksotis Selat Makassar.<br><b>Lokasi:</b> Pesisir Lapeo, Kec. Campalagian.</p>");
 
                 setTimeout(function() {
                     map.invalidateSize();
@@ -649,7 +649,7 @@
                 petaSection.scrollIntoView({ behavior: 'smooth' });
                 setTimeout(() => {
                     if (map) {
-                        map.setView([lat, lng], 16);
+                        map.setView([lat, lng], 16); // Fokus zoom diperdekat pas klik tombol
                         map.invalidateSize(); 
                         if (namaTempat === 'Masjid Lapeo' && markerMasjid) markerMasjid.openPopup();
                         if (namaTempat === 'Pantai Baqbatoa' && markerPantai) markerPantai.openPopup();
