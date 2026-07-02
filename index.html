@@ -14,18 +14,20 @@
         }
 
         html {
-            scroll-behavior: smooth; /* Membuat transisi klik menu/tombol bergulir dengan halus */
+            scroll-behavior: smooth;
         }
 
         body {
             color: #333;
             background-color: #f4f6f8;
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
         /* --- NAVBAR --- */
         header {
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(5px);
             padding: 20px 10%;
             display: flex;
             justify-content: space-between;
@@ -34,7 +36,8 @@
             width: 100%;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
         }
 
         .logo {
@@ -61,10 +64,27 @@
             color: #555;
             font-weight: 600;
             transition: color 0.3s;
+            position: relative;
+            padding-bottom: 5px;
         }
 
-        nav ul li a:hover {
+        nav ul li a:hover, nav ul li a.active {
             color: #0288d1;
+        }
+        
+        /* Efek garis bawah pada menu aktif */
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #0288d1;
+            transition: width 0.3s ease;
+        }
+        nav ul li a:hover::after, nav ul li a.active::after {
+            width: 100%;
         }
 
         /* --- HERO SECTION --- */
@@ -84,6 +104,7 @@
             font-size: 44px;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            animation: fadeInUp 1s ease;
         }
 
         .hero p {
@@ -91,6 +112,7 @@
             margin-bottom: 25px;
             max-width: 700px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            animation: fadeInUp 1.2s ease;
         }
 
         .btn {
@@ -101,18 +123,21 @@
             text-decoration: none;
             border-radius: 5px;
             font-weight: bold;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(2, 136, 209, 0.2);
         }
 
         .btn:hover {
             background-color: #01579b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(1, 87, 155, 0.3);
         }
 
         /* --- BMKG CUACA SECTION --- */
         .bmkg-container {
             padding: 40px 10% 0 10%;
             text-align: center;
-            margin-top: 80px; /* Ditambah agar widget cuaca tidak tertutup navbar fixed */
+            margin-top: 80px;
         }
 
         .bmkg-box {
@@ -123,6 +148,10 @@
             max-width: 600px;
             margin: 0 auto;
             border-left: 5px solid #0288d1;
+            transition: transform 0.3s ease;
+        }
+        .bmkg-box:hover {
+            transform: scale(1.02);
         }
 
         .bmkg-header {
@@ -207,17 +236,28 @@
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: transform 0.3s;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .card:hover {
-            transform: translateY(-5px);
+            transform: translateY(-8px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+        }
+
+        .img-container {
+            overflow: hidden;
+            height: 220px;
         }
 
         .card img {
             width: 100%;
-            height: 220px;
+            height: 100%;
             object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .card-img {
+            transform: scale(1.1);
         }
 
         .card-content {
@@ -262,6 +302,11 @@
             border-radius: 8px;
             border-top: 4px solid #0288d1;
             box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+            transition: transform 0.3s ease;
+        }
+        
+        .fakta-item:hover {
+            transform: translateY(-3px);
         }
 
         .fakta-item h3 {
@@ -327,7 +372,7 @@
             font-weight: bold;
         }
 
-        /* Timeline / Langkah Rute Perjalanan */
+        /* Timeline / Langkah Rute Perjalanan dengan Efek Interaktif */
         .timeline-rute {
             border-left: 3px solid #0288d1;
             margin-left: 10px;
@@ -338,6 +383,14 @@
         .rute-step {
             margin-bottom: 25px;
             position: relative;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 6px;
+            transition: background 0.3s ease;
+        }
+
+        .rute-step:hover {
+            background: #f0f7fc;
         }
 
         .rute-step:last-child {
@@ -348,24 +401,91 @@
             content: '';
             position: absolute;
             left: -32px;
-            top: 6px;
+            top: 16px;
             width: 12px;
             height: 12px;
             border-radius: 50%;
             background-color: #0288d1;
             border: 2px solid white;
+            transition: transform 0.3s ease;
+        }
+
+        .rute-step:hover::before {
+            transform: scale(1.4);
+            background-color: #01579b;
         }
 
         .rute-step h4 {
             color: #0288d1;
             font-size: 16px;
             margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Tambahan Penanda Selesai Mengunjungi Rute */
+        .rute-step.completed h4 {
+            text-decoration: line-through;
+            color: #7f8c8d;
+        }
+        .rute-step.completed p {
+            color: #b2bec3;
         }
 
         .rute-step p {
             font-size: 14px;
             color: #666;
             line-height: 1.6;
+        }
+
+        /* --- BUTTON BACK TO TOP --- */
+        #backToTop {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: #0288d1;
+            color: white;
+            border: none;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 99;
+            transition: all 0.3s ease;
+        }
+
+        #backToTop:hover {
+            background-color: #01579b;
+            transform: translateY(-5px);
+        }
+
+        /* --- ANIMASI & SCROLL REVEAL --- */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         /* --- FOOTER --- */
@@ -380,14 +500,14 @@
 </head>
 <body>
 
-    <header>
+    <header id="navbar">
         <div class="logo">Explore<span>Lapeo</span></div>
         <nav>
             <ul>
-                <li><a href="#">Beranda</a></li>
-                <li><a href="#destinasi">Destinasi</a></li>
-                <li><a href="#fakta-budaya">Fakta Budaya</a></li>
-                <li><a href="#panduan-wisata">Panduan Wisata</a></li>
+                <li><a href="#" class="nav-link active">Beranda</a></li>
+                <li><a href="#destinasi" class="nav-link">Destinasi</a></li>
+                <li><a href="#fakta-budaya" class="nav-link">Fakta Budaya</a></li>
+                <li><a href="#panduan-wisata" class="nav-link">Panduan Wisata</a></li>
             </ul>
         </nav>
     </header>
@@ -398,7 +518,7 @@
         <a href="#destinasi" class="btn">Jelajahi Lapeo</a>
     </section>
 
-    <div class="bmkg-container">
+    <div class="bmkg-container reveal">
         <div class="bmkg-box" id="weather-box">
             <div class="bmkg-header">📍 Cuaca Real-Time BMKG (Campalagian)</div>
             <div id="loading-weather">Memuat data cuaca langsung dari BMKG...</div>
@@ -419,14 +539,16 @@
         </div>
     </div>
 
-    <section class="destinasi" id="destinasi">
+    <section class="destinasi reveal" id="destinasi">
         <h2>Destinasi & Potensi Wisata</h2>
         <p class="sub-title">Destinasi menarik yang wajib Anda kunjungi saat berada di Desa Lapeo</p>
         
         <div class="card-container">
             
             <div class="card">
-                <img src="images/masjid-lapeo.jpg" alt="Masjid Nuruttaubah">
+                <div class="img-container">
+                    <img src="images/masjid-lapeo.jpg" alt="Masjid Nuruttaubah" class="card-img">
+                </div>
                 <div class="card-content">
                     <h3>Masjid Nuruttaubah KH. Muhammad Thahir Imam Lapeo</h3>
                     <p>Pusat ziarah dan wisata religi Sulawesi Barat yang ikonik, didirikan oleh ulama besar penyebar Islam di tanah Mandar, KH. Muhammad Thahir.</p>
@@ -435,7 +557,9 @@
             </div>
 
             <div class="card">
-                <img src="images/pantai-baqbatoa.jpg" alt="Pantai Baqbatoa">
+                <div class="img-container">
+                    <img src="images/pantai-baqbatoa.jpg" alt="Pantai Baqbatoa" class="card-img">
+                </div>
                 <div class="card-content">
                     <h3>Pantai Baqbatoa</h3>
                     <p>Nikmati pesona keindahan pesisir pantai dengan hamparan pasir, deburan ombak Selat Makassar yang syahdu, serta pemandangan matahari terbenam.</p>
@@ -444,7 +568,9 @@
             </div>
 
             <div class="card">
-                <img src="images/fakta-lapeo.jpg" alt="Fakta Unik Budaya Lapeo">
+                <div class="img-container">
+                    <img src="images/fakta-lapeo.jpg" alt="Fakta Unik Budaya Lapeo" class="card-img">
+                </div>
                 <div class="card-content">
                     <h3>Fakta Unik & Khazanah Budaya Lapeo</h3>
                     <p>Ketahui asal-usul nama Lapeo yang bermakna "tertiup angin laut" hingga kemegahan adat lokal Sayyang Pattu'du (kuda menari) yang menawan.</p>
@@ -455,7 +581,7 @@
         </div>
     </section>
 
-    <section class="fakta-detail-section" id="fakta-budaya">
+    <section class="fakta-detail-section reveal" id="fakta-budaya">
         <h2>Khazanah & Cerita Unik Desa Lapeo</h2>
         
         <div class="fakta-grid">
@@ -473,7 +599,7 @@
         </div>
     </section>
 
-    <section class="info-rute-section" id="panduan-wisata">
+    <section class="info-rute-section reveal" id="panduan-wisata">
         <h2>Panduan & Rute Kunjungan Wisatawan</h2>
         
         <div class="info-grid">
@@ -489,17 +615,17 @@
             </div>
 
             <div class="rute-card">
-                <h3>Rute Perjalanan Ideal (1 Hari)</h3>
+                <h3>Rute Perjalanan Ideal (1 Hari) <br><small style="font-size: 12px; color: #7f8c8d;">(Klik rute untuk menandai tempat yang sudah dikunjungi)</small></h3>
                 <div class="timeline-rute">
-                    <div class="rute-step">
+                    <div class="rute-step" onclick="toggleRoute(this)">
                         <h4>09.00 WITA — Tiba & Ziarah Religi</h4>
                         <p>Memulai perjalanan dengan mengunjungi Masjid Nuruttaubah Lapeo, berziarah ke makam Imam Lapeo, dan mengagumi kemegahan arsitektur serta menara masjid.</p>
                     </div>
-                    <div class="rute-step">
+                    <div class="rute-step" onclick="toggleRoute(this)">
                         <h4>12.00 WITA — Istirahat & Kuliner Mandar</h4>
                         <p>Menunaikan ibadah shalat Dzuhur berjamaah di masjid, dilanjutkan makan siang mencicipi berbagai hidangan kuliner laut khas Mandar yang segar di sekitar Campalagian.</p>
                     </div>
-                    <div class="rute-step">
+                    <div class="rute-step" onclick="toggleRoute(this)">
                         <h4>15.30 WITA — Refreshing di Pantai Baqbatoa</h4>
                         <p>Bertolak menuju Pantai Baqbatoa untuk bersantai menikmati hembusan angin laut Selat Makassar, menyusuri pesisir pantai, dan menunggu keindahan panorama sunset.</p>
                     </div>
@@ -509,11 +635,14 @@
         </div>
     </section>
 
+    <button id="backToTop" onclick="scrollToTop()" title="Kembali ke Atas">↑</button>
+
     <footer>
         <p>© 2026 Wisata Lapeo, Campalagian, Sulawesi Barat. Dibuat untuk mengenalkan keindahan nusantara.</p>
     </footer>
 
     <script>
+        /* --- INTEGRASI BMKG --- */
         async function ambilDataCuacaBMKG() {
             const urlAPI = "https://api.bmkg.go.id/publik/prakiraan-cuaca?adm2=76.04";
 
@@ -556,7 +685,79 @@
             document.getElementById('weather-content').style.display = 'block';
         }
 
-        window.onload = ambilDataCuacaBMKG;
+        /* --- FITUR INTERAKTIF BARU --- */
+
+        // 1. Fungsi Klik Rute Perjalanan (Itinerary Tracker)
+        function toggleRoute(element) {
+            element.classList.toggle('completed');
+        }
+
+        // 2. Tombol Kembali Ke Atas (Back To Top) & Efek Navbar Perkecil
+        const backToTopBtn = document.getElementById("backToTop");
+        const navbar = document.getElementById("navbar");
+
+        window.onscroll = function() {
+            scrollFunction();
+            revealElements();
+            navHighlighter();
+        };
+
+        function scrollFunction() {
+            // Tampilkan tombol back to top
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                backToTopBtn.style.display = "flex";
+                navbar.style.padding = "10px 10%"; // Navbar mengecil saat di-scroll
+            } else {
+                backToTopBtn.style.display = "none";
+                navbar.style.padding = "20px 10%";
+            }
+        }
+
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        // 3. Animasi Muncul Saat Gulir (Scroll Reveal)
+        function revealElements() {
+            const reveals = document.querySelectorAll(".reveal");
+            for (let i = 0; i < reveals.length; i++) {
+                const windowHeight = window.innerHeight;
+                const elementTop = reveals[i].getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+
+        // 4. Otomatisasi Navigasi Aktif Mengikuti Posisi Halaman (Scrollspy)
+        const sections = document.querySelectorAll("section[id]");
+        
+        function navHighlighter() {
+            let scrollY = window.pageYOffset;
+            
+            sections.forEach(current => {
+                const sectionHeight = current.offsetHeight;
+                const sectionTop = current.offsetTop - 100;
+                let sectionId = current.getAttribute("id");
+                
+                if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                    document.querySelector("nav ul li a[href*=" + sectionId + "]").classList.add("active");
+                } else {
+                    document.querySelector("nav ul li a[href*=" + sectionId + "]").classList.remove("active");
+                }
+            });
+        }
+
+        // Jalankan fungsi awal saat halaman selesai dimuat
+        window.onload = function() {
+            ambilDataCuacaBMKG();
+            revealElements(); // Jalankan sekali untuk mendeteksi elemen teratas
+        };
     </script>
 </body>
 </html>
