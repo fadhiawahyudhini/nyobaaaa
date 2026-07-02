@@ -198,6 +198,13 @@
             height: 60px;
         }
 
+        .weather-update-time {
+            font-size: 11px;
+            color: #95a5a6;
+            margin-top: 8px;
+            display: block;
+        }
+
         /* --- DESTINASI SECTION --- */
         .destinasi {
             padding: 60px 10% 40px 10%;
@@ -535,6 +542,7 @@
                     <div>💧 Kelembapan: <span id="weather-humidity">--</span>%</div>
                     <div>💨 Kecepatan Angin: <span id="weather-wind">--</span> km/jam</div>
                 </div>
+                <small id="weather-time" class="weather-update-time">Diperbarui: --:-- WITA</small>
             </div>
         </div>
     </div>
@@ -642,7 +650,7 @@
     </footer>
 
     <script>
-        /* --- INTEGRASI BMKG --- */
+        /* --- INTEGRASI BMKG REAL-TIME --- */
         async function ambilDataCuacaBMKG() {
             const urlAPI = "https://api.bmkg.go.id/publik/prakiraan-cuaca?adm2=76.04";
 
@@ -653,16 +661,38 @@
                 const dataCampalagian = data.data.find(item => item.lokasi.kecamatan === "Campalagian");
                 
                 if (dataCampalagian && dataCampalagian.prakiraan && dataCampalagian.prakiraan.cuaca) {
-                    const cuacaSekarang = dataCampalagian.prakiraan.cuaca[0];
-
-                    document.getElementById('weather-temp').innerText = cuacaSekarang.t + "°C";
-                    document.getElementById('weather-desc').innerText = cuacaSekarang.weather_desc;
-                    document.getElementById('weather-humidity').innerText = cuacaSekarang.hu;
-                    document.getElementById('weather-wind').innerText = cuacaSekarang.ws;
+                    const listCuaca = dataCampalagian.prakiraan.cuaca;
                     
-                    if(cuacaSekarang.image) {
-                        document.getElementById('weather-img').src = cuacaSekarang.image;
+                    // Algoritma Real-Time: Mencari prakiraan jam terdekat dari jam saat ini
+                    const jamSekarang = new Date().getHours();
+                    let cuacaTerpilih = listCuaca[0]; // Default fallback
+                    let selisihTerkecil = 24;
+
+                    listCuaca.forEach(item => {
+                        // Memotong string waktu dari properti lokal API (Contoh format: "2026-07-02 12:00:00")
+                        if (item.local_datetime) {
+                            const jamPrakiraan = new Date(item.local_datetime).getHours();
+                            const selisih = Math.abs(jamSekarang - jamPrakiraan);
+                            if (selisih < selisihTerkecil) {
+                                selisihTerkecil = selisih;
+                                cuacaTerpilih = item;
+                            }
+                        }
+                    });
+
+                    // Menampilkan hasil data terdekat ke UI
+                    document.getElementById('weather-temp').innerText = cuacaTerpilih.t + "°C";
+                    document.getElementById('weather-desc').innerText = cuacaTerpilih.weather_desc;
+                    document.getElementById('weather-humidity').innerText = cuacaTerpilih.hu;
+                    document.getElementById('weather-wind').innerText = cuacaTerpilih.ws;
+                    
+                    if(cuacaTerpilih.image) {
+                        document.getElementById('weather-img').src = cuacaTerpilih.image;
                     }
+
+                    // Tampilkan waktu pembaruan sukses
+                    const waktuSekarang = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+                    document.getElementById('weather-time').innerText = `Pembaruan Terakhir: Jam ${waktuSekarang} WITA`;
 
                     document.getElementById('loading-weather').style.display = 'none';
                     document.getElementById('weather-content').style.display = 'block';
@@ -670,7 +700,7 @@
                     gunakanDataCadangan();
                 }
             } catch (error) {
-                console.error("Gagal mengambil data BMKG, menggunakan mode preview lokal:", error);
+                console.error("Gagal mengambil data real-time BMKG, masuk ke mode cadangan:", error);
                 gunakanDataCadangan();
             }
         }
@@ -681,11 +711,12 @@
             document.getElementById('weather-humidity').innerText = "78";
             document.getElementById('weather-wind').innerText = "14";
             document.getElementById('weather-img').src = "https://cdn-icons-png.flaticon.com/512/4814/4814268.png";
+            document.getElementById('weather-time').innerText = "Mode Cadangan Aktif";
             document.getElementById('loading-weather').style.display = 'none';
             document.getElementById('weather-content').style.display = 'block';
         }
 
-        /* --- FITUR INTERAKTIF BARU --- */
+        /* --- FITUR INTERAKTIF --- */
 
         // 1. Fungsi Klik Rute Perjalanan (Itinerary Tracker)
         function toggleRoute(element) {
@@ -703,10 +734,9 @@
         };
 
         function scrollFunction() {
-            // Tampilkan tombol back to top
             if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
                 backToTopBtn.style.display = "flex";
-                navbar.style.padding = "10px 10%"; // Navbar mengecil saat di-scroll
+                navbar.style.padding = "10px 10%";
             } else {
                 backToTopBtn.style.display = "none";
                 navbar.style.padding = "20px 10%";
@@ -756,7 +786,10 @@
         // Jalankan fungsi awal saat halaman selesai dimuat
         window.onload = function() {
             ambilDataCuacaBMKG();
-            revealElements(); // Jalankan sekali untuk mendeteksi elemen teratas
+            revealElements();
+            
+            // Pengulangan Real-time Otomatis: Sinkronisasi data ulang setiap 10 Menit tanpa refresh halaman
+            setInterval(ambilDataCuacaBMKG, 600000); 
         };
     </script>
 </body>
