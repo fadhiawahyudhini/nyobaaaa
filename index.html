@@ -618,4 +618,15 @@
                 if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
                     document.querySelector("nav ul li a[href*=" + sectionId + "]").classList.add("active");
                 } else {
-                    document.querySelector("nav ul li a[href*=" + sectionId + "]").classList.remove
+                    document.querySelector("nav ul li a[href*=" + sectionId + "]").classList.remove("active");
+                }
+            });
+        }
+
+        // Jalankan fungsi awal saat halaman selesai dimuat
+        window.onload = function() {
+            revealElements();
+        };
+    </script>
+</body>
+</html>
